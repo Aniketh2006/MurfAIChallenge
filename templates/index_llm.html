@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days of MurfAI - AI Voice Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e6ed;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(26, 32, 44, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #2b6cb0 100%);
+            color: #e2e8f0;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+            background: rgba(45, 55, 72, 0.6);
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #cbd5e0;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(26, 32, 44, 0.8);
+            color: #e2e8f0;
+        }
+        
+        textarea::placeholder {
+            color: #718096;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(26, 32, 44, 0.8);
+            color: #e2e8f0;
+            transition: border-color 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+        
+        select option {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(49, 130, 206, 0.4);
+            background: linear-gradient(135deg, #2b6cb0, #2c5282);
+        }
+        
+        .generate-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Section Styles */
+        .section {
+            margin-bottom: 50px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        
+        /* LLM Query Section Styles */
+        .llm-section {
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .llm-section h1 {
+            color: #a78bfa;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .input-toggle {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(26, 32, 44, 0.6);
+            border-radius: 10px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(45, 55, 72, 0.8);
+            color: #e2e8f0;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border-color: #8b5cf6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+        
+        .toggle-btn:hover:not(.active) {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+        
+        .input-method {
+            display: none;
+        }
+        
+        .input-method.active {
+            display: block;
+        }
+        
+        .llm-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .llm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+        
+        .llm-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .llm-recording-status {
+            text-align: center;
+            padding: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #8b5cf6;
+        }
+        
+        .llm-recording-status.recording {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            animation: pulse-llm 1.5s infinite;
+        }
+        
+        @keyframes pulse-llm {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+        
+        .llm-timer {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 10px;
+        }
+        
+        .llm-hint {
+            color: #cbd5e0;
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .llm-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .llm-record-btn {
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .llm-record-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .llm-record-btn.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .llm-record-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Result Section */
+        .result-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(45, 55, 72, 0.8);
+            border-radius: 15px;
+            border: 2px dashed #4a5568;
+        }
+        
+        .result-section.hidden {
+            display: none;
+        }
+        
+        .result-section.success {
+            background: rgba(56, 161, 105, 0.2);
+            border-color: #38a169;
+        }
+        
+        .result-section.error {
+            background: rgba(245, 101, 101, 0.2);
+            border-color: #f56565;
+        }
+        
+        .result-section.loading {
+            background: rgba(49, 130, 206, 0.2);
+            border-color: #3182ce;
+        }
+        
+        .llm-result-section {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+        
+        .audio-player-container {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(26, 32, 44, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .llm-response-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .llm-response-label {
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+        
+        .llm-response-text {
+            color: #e2e8f0;
+            line-height: 1.7;
+            font-size: 1em;
+            background: rgba(26, 32, 44, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .audio-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .audio-info h3 {
+            color: #e2e8f0;
+            font-size: 1.3em;
+        }
+        
+        .audio-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #a0aec0;
+        }
+        
+        .echo-audio-player {
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            background: #2d3748;
+            margin-top: 10px;
+            outline: none;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #4a5568;
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .message {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        .success-message {
+            color: #68d391;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            color: #fc8181;
+            font-weight: 600;
+        }
+        
+        .loading-message {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row, .llm-controls, .input-toggle {
+                grid-template-columns: 1fr;
+            }
+            
+            .audio-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .audio-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Voice Assistant</h1>
+            <p>Powered by Murf AI, Google Gemini, and AssemblyAI</p>
+        </div>
+        
+        <div class="content">
+            <!-- LLM Query Section -->
+            <div class="section llm-section">
+                <h1>
+                    <span>🧠</span>
+                    <span>AI Assistant</span>
+                </h1>
+                <p style="margin-bottom: 25px; color: #cbd5e0; font-size: 1.1em;">
+                    Ask me anything! Type your question or record your voice, and I'll respond with AI-generated audio.
+                </p>
+                
+                <div class="input-section">
+                    <!-- Input Method Toggle -->
+                    <div class="input-toggle">
+                        <button class="toggle-btn active" id="textInputBtn" onclick="switchInputMethod('text')">
+                            📝 Text Input
+                        </button>
+                        <button class="toggle-btn" id="voiceInputBtn" onclick="switchInputMethod('voice')">
+                            🎤 Voice Input
+                        </button>
+                    </div>
+                    
+                    <!-- Text Input Method -->
+                    <div id="textInputMethod" class="input-method active">
+                        <div class="form-group">
+                            <label for="llmTextInput">Your Question:</label>
+                            <textarea 
+                                id="llmTextInput" 
+                                placeholder="Ask me anything... What would you like to know?"
+                                rows="4"
+                            >What are the benefits of artificial intelligence in healthcare?</textarea>
+                        </div>
+                        <button class="llm-btn" id="submitTextBtn" onclick="submitTextQuery()">
+                            🚀 Get AI Response
+                        </button>
+                    </div>
+                    
+                    <!-- Voice Input Method -->
+                    <div id="voiceInputMethod" class="input-method">
+                        <div class="llm-recording-status" id="llmRecordingStatus">
+                            <div class="llm-timer" id="llmTimer">Ready to Record</div>
+                            <div class="llm-hint">Click "Start Recording" and ask your question</div>
+                        </div>
+                        
+                        <div class="llm-controls">
+                            <button class="llm-record-btn" id="llmStartBtn" onclick="startLLMRecording()">
+                                🎤 Start Recording
+                            </button>
+                            <button class="llm-record-btn" id="llmStopBtn" onclick="stopLLMRecording()" disabled>
+                                ⏹️ Stop & Send
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Result Section -->
+                    <div id="llmResult" class="result-section llm-result-section hidden">
+                        <div id="llmResultContent"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TTS Generator Section -->
+            <div class="section">
+                <h1>🎤 Text-to-Speech Generator</h1>
+                <div class="input-section">
+                    <form id="ttsForm">
+                        <div class="form-group">
+                            <label for="text">Enter Your Text:</label>
+                            <textarea 
+                                id="text" 
+                                placeholder="Type or paste the text you want to convert to speech..."
+                                required
+                            >Hello! Welcome to the 30 Days of MurfAI challenge. This is an amazing text-to-speech generator powered by Murf AI.</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="voice_id">Select Voice:</label>
+                                <select id="voice_id">
+                                    <option value="en-US-ken">Ken (US English, Male)</option>
+                                    <option value="en-US-sarah">Sarah (US English, Female)</option>
+                                    <option value="en-US-marcus">Marcus (US English, Male)</option>
+                                    <option value="en-US-claire">Claire (US English, Female)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="style">Speaking Style:</label>
+                                <select id="style">
+                                    <option value="Neutral">Neutral</option>
+                                    <option value="Cheerful">Cheerful</option>
+                                    <option value="Excited">Excited</option>
+                                    <option value="Calm">Calm</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="generate-btn" id="generateBtn">
+                            🎯 Generate Audio
+                        </button>
+                    </form>
+                </div>
+                
+                <div id="resultSection" class="result-section hidden">
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // LLM Query Application
+        class LLMAssistant {
+            constructor() {
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.isRecording = false;
+                this.recordingStartTime = null;
+                this.recordingInterval = null;
+                this.currentInputMethod = 'text';
+            }
+            
+            switchInputMethod(method) {
+                this.currentInputMethod = method;
+                
+                // Update toggle buttons
+                document.getElementById('textInputBtn').classList.toggle('active', method === 'text');
+                document.getElementById('voiceInputBtn').classList.toggle('active', method === 'voice');
+                
+                // Show/hide input methods
+                document.getElementById('textInputMethod').classList.toggle('active', method === 'text');
+                document.getElementById('voiceInputMethod').classList.toggle('active', method === 'voice');
+                
+                // Clear any existing results
+                this.hideLLMResult();
+            }
+            
+            async submitTextQuery() {
+                const text = document.getElementById('llmTextInput').value.trim();
+                
+                if (!text) {
+                    this.showLLMError('Please enter a question or prompt.');
+                    return;
+                }
+                
+                this.showLLMResult('loading', 'Processing your query with AI...', '');
+                
+                try {
+                    // Send as JSON for text queries
+                    const response = await fetch('/llm/query', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: text })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.detail || 'Failed to process query');
+                    }
+                    
+                    if (data.success && data.audio_url) {
+                        this.showLLMResponse(data, text);
+                    } else {
+                        throw new Error(data.message || 'No audio response received');
+                    }
+                    
+                } catch (error) {
+                    this.showLLMError(`Failed to process query: ${error.message}`);
+                }
+            }
+            
+            async startLLMRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+                    
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+                    
+                    this.mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                        this.sendAudioQuery(audioBlob);
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.recordingStartTime = Date.now();
+                    
+                    // Update UI
+                    document.getElementById('llmStartBtn').disabled = true;
+                    document.getElementById('llmStopBtn').disabled = false;
+                    document.getElementById('llmRecordingStatus').classList.add('recording');
+                    
+                    // Start timer
+                    this.recordingInterval = setInterval(() => {
+                        this.updateLLMTimer();
+                    }, 100);
+                    
+                    this.hideLLMResult();
+                    
+                } catch (error) {
+                    this.showLLMError('Failed to start recording. Please check your microphone permissions.');
+                }
+            }
+            
+            stopLLMRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    
+                    // Update UI
+                    document.getElementById('llmStartBtn').disabled = false;
+                    document.getElementById('llmStopBtn').disabled = true;
+                    document.getElementById('llmRecordingStatus').classList.remove('recording');
+                    
+                    // Stop timer
+                    clearInterval(this.recordingInterval);
+                    this.recordingInterval = null;
+                    document.getElementById('llmTimer').textContent = 'Processing...';
+                }
+            }
+            
+            updateLLMTimer() {
+                if (this.recordingStartTime) {
+                    const elapsed = (Date.now() - this.recordingStartTime) / 1000;
+                    document.getElementById('llmTimer').textContent = `Recording: ${elapsed.toFixed(1)}s`;
+                }
+            }
+            
+            async sendAudioQuery(audioBlob) {
+                this.showLLMResult('loading', 'Transcribing and processing with AI...', `
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="loading-spinner" style="margin: 0 auto;"></div>
+                        <p style="margin-top: 15px; color: #a0aec0;">Your voice is being transcribed and sent to the AI...</p>
+                    </div>
+                `);
+                
+                try {
+                    const formData = new FormData();
+                    const audioFile = new File([audioBlob], 'query.wav', { type: 'audio/wav' });
+                    formData.append('audio_file', audioFile);
+                    
+                    const response = await fetch('/llm/query', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.detail || 'Failed to process audio query');
+                    }
+                    
+                    if (data.success && data.audio_url) {
+                        // Extract the LLM response text from the message
+                        const responseText = data.message.replace('LLM responded: ', '');
+                        this.showLLMResponse(data, responseText);
+                    } else {
+                        throw new Error(data.message || 'No audio response received');
+                    }
+                    
+                } catch (error) {
+                    this.showLLMError(`Failed to process audio query: ${error.message}`);
+                } finally {
+                    document.getElementById('llmTimer').textContent = 'Ready to Record';
+                }
+            }
+            
+            showLLMResponse(data, queryText) {
+                // Extract the actual response text from the message
+                const responseText = data.message.replace('LLM responded: ', '');
+                const wordCount = data.word_count || responseText.split(' ').length;
+                
+                const responseHTML = `
+                    <div class="message success-message">
+                        ✅ AI Response Generated!
+                    </div>
+                    
+                    <div class="llm-response-container">
+                        <div class="llm-response-label">🤖 AI Response:</div>
+                        <div class="llm-response-text">${responseText}</div>
+                    </div>
+                    
+                    <div class="audio-player-container">
+                        <div class="audio-info">
+                            <h3>🎵 AI Voice Response</h3>
+                            <div class="audio-stats">
+                                <span>📝 Words: ${wordCount}</span>
+                                <span>🎤 Voice: Marcus (Professional)</span>
+                            </div>
+                        </div>
+                        
+                        <audio class="echo-audio-player" controls autoplay>
+                            <source src="${data.audio_url}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                `;
+                
+                this.showLLMResult('success', '', responseHTML);
+            }
+            
+            showLLMResult(type, message, content) {
+                const resultSection = document.getElementById('llmResult');
+                const resultContent = document.getElementById('llmResultContent');
+                
+                resultSection.className = `result-section llm-result-section ${type}`;
+                resultSection.classList.remove('hidden');
+                
+                let html = '';
+                if (message) {
+                    const messageClass = type === 'error' ? 'error-message' : 
+                                        type === 'loading' ? 'loading-message' : 'success-message';
+                    html += `<div class="message ${messageClass}">`;
+                    if (type === 'loading') {
+                        html += `<span class="loading-spinner"></span> `;
+                    }
+                    html += `${message}</div>`;
+                }
+                
+                if (content) {
+                    html += content;
+                }
+                
+                resultContent.innerHTML = html;
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            showLLMError(message) {
+                this.showLLMResult('error', `❌ ${message}`, '');
+            }
+            
+            hideLLMResult() {
+                document.getElementById('llmResult').classList.add('hidden');
+            }
+        }
+        
+        // Initialize LLM Assistant
+        const llmAssistant = new LLMAssistant();
+        
+        // Global functions for HTML onclick handlers
+        function switchInputMethod(method) {
+            llmAssistant.switchInputMethod(method);
+        }
+        
+        function submitTextQuery() {
+            llmAssistant.submitTextQuery();
+        }
+        
+        function startLLMRecording() {
+            llmAssistant.startLLMRecording();
+        }
+        
+        function stopLLMRecording() {
+            llmAssistant.stopLLMRecording();
+        }
+        
+        // TTS Generator functionality (simplified version)
+        document.getElementById('ttsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = document.getElementById('text').value.trim();
+            const voiceId = document.getElementById('voice_id').value;
+            const style = document.getElementById('style').value;
+            
+            if (!text) {
+                alert('Please enter some text to convert to speech.');
+                return;
+            }
+            
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+            
+            try {
+                const response = await fetch('/tts/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_id: voiceId,
+                        style: style
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showTTSResult(data);
+                } else {
+                    throw new Error(data.detail || 'Failed to generate audio');
+                }
+                
+            } catch (error) {
+                alert(`Failed to generate audio: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🎯 Generate Audio';
+            }
+        });
+        
+        function showTTSResult(data) {
+            const resultHTML = `
+                <div class="message success-message">
+                    ✅ Audio generated successfully!
+                </div>
+                <div class="audio-player-container">
+                    <div class="audio-info">
+                        <h3>🎵 Generated Audio</h3>
+                        <div class="audio-stats">
+                            <span>📝 Words: ${data.word_count}</span>
+                        </div>
+                    </div>
+                    
+                    <audio class="echo-audio-player" controls>
+                        <source src="${data.audio_url}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            `;
+            
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultSection.className = 'result-section success';
+            resultSection.classList.remove('hidden');
+            resultContent.innerHTML = resultHTML;
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>

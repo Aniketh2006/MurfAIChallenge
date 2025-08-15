@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days of MurfAI - TTS Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e6ed;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(26, 32, 44, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #2b6cb0 100%);
+            color: #e2e8f0;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+            background: rgba(45, 55, 72, 0.6);
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #cbd5e0;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(26, 32, 44, 0.8);
+            color: #e2e8f0;
+        }
+        
+        textarea::placeholder {
+            color: #718096;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(26, 32, 44, 0.8);
+            color: #e2e8f0;
+            transition: border-color 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+        
+        select option {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(49, 130, 206, 0.4);
+            background: linear-gradient(135deg, #2b6cb0, #2c5282);
+        }
+        
+        .generate-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Echo Bot Styles */
+        .section {
+            margin-bottom: 50px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .section h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        
+        .record-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #38a169, #2f855a);
+            color: #e2e8f0;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+        }
+        
+        .record-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(56, 161, 105, 0.4);
+        }
+        
+        .record-btn:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .record-btn.recording {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .recording-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .recording-status {
+            text-align: center;
+            padding: 15px;
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #4a5568;
+        }
+        
+        .recording-status.recording {
+            border-color: #e53e3e;
+            background: rgba(229, 62, 62, 0.1);
+        }
+        
+        .recording-timer {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        
+        .echo-audio-player {
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+        
+        .file-details {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(45, 55, 72, 0.5);
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+        }
+        
+        .detail-item {
+            margin: 10px 0;
+            padding: 8px 0;
+            color: #e2e8f0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(74, 85, 104, 0.3);
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-item strong {
+            color: #68d391;
+            margin-right: 8px;
+        }
+        
+        .recording-actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        /* Audio Player Styling */
+        .audio-playback-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(68, 211, 145, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(68, 211, 145, 0.3);
+        }
+        
+        .echo-audio-player {
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            background: #2d3748;
+            margin-top: 10px;
+            outline: none;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-panel {
+            background-color: #2d3748;
+            border-radius: 25px;
+            border: none;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-enclosure {
+            background-color: #2d3748;
+            border-radius: 25px;
+            border: none;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-play-button,
+        .echo-audio-player::-webkit-media-controls-pause-button {
+            background-color: transparent;
+            color: #ffffff;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-timeline-container {
+            background-color: transparent;
+            border-radius: 10px;
+            margin: 0 15px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-timeline {
+            background-color: #4a5568;
+            border-radius: 10px;
+            height: 4px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-progress-bar {
+            background-color: #ffffff;
+            border-radius: 10px;
+            height: 4px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-current-time-display,
+        .echo-audio-player::-webkit-media-controls-time-remaining-display {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 400;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-volume-slider-container {
+            background-color: transparent;
+            border-radius: 10px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-volume-slider {
+            background-color: #4a5568;
+            border-radius: 10px;
+        }
+        
+        .echo-audio-player::-webkit-media-controls-mute-button {
+            background-color: transparent;
+            color: #ffffff;
+            margin-right: 10px;
+        }
+        
+        .action-btn {
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn:hover {
+            background: #2563eb !important;
+        }
+        
+        .record-btn:hover {
+            background: #22c55e !important;
+        }
+        
+        /* Transcription Results Styling */
+        .transcription-container {
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(45, 55, 72, 0.6);
+            border-radius: 12px;
+            border: 1px solid #4a5568;
+        }
+        
+        .transcription-details h3 {
+            color: #68d391;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .transcript-text {
+            margin-bottom: 15px;
+        }
+        
+        .transcript-label {
+            margin-bottom: 8px;
+            color: #68d391;
+            font-weight: 600;
+        }
+        
+        .transcript-content {
+            background: rgba(26, 32, 44, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 16px;
+            line-height: 1.6;
+            border-left: 4px solid #68d391;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .confidence-score,
+        .language-detected {
+            margin: 10px 0;
+            padding: 8px 12px;
+            background: rgba(68, 211, 145, 0.1);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 14px;
+            border: 1px solid rgba(68, 211, 145, 0.3);
+        }
+        
+        .confidence-score strong,
+        .language-detected strong {
+            color: #68d391;
+        }
+        
+        .recording-actions .record-btn {
+            background: #4ade80;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .recording-actions .record-btn:hover {
+            background: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 222, 128, 0.3);
+        }
+        
+        .result-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(45, 55, 72, 0.8);
+            border-radius: 15px;
+            border: 2px dashed #4a5568;
+        }
+        
+        .result-section.hidden {
+            display: none;
+        }
+        
+        .result-section.success {
+            background: rgba(56, 161, 105, 0.2);
+            border-color: #38a169;
+        }
+        
+        .result-section.error {
+            background: rgba(245, 101, 101, 0.2);
+            border-color: #f56565;
+        }
+        
+        .result-section.loading {
+            background: rgba(49, 130, 206, 0.2);
+            border-color: #3182ce;
+        }
+        
+        .audio-player-container {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(26, 32, 44, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .audio-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .audio-info h3 {
+            color: #e2e8f0;
+            font-size: 1.3em;
+        }
+        
+        .audio-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #a0aec0;
+        }
+        
+        .custom-audio-player {
+            width: 100%;
+            height: 60px;
+            background: rgba(45, 55, 72, 0.8);
+            border-radius: 10px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #4a5568;
+        }
+        
+        .play-pause-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            border: none;
+            color: #e2e8f0;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+        
+        .play-pause-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4);
+        }
+        
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: #4a5568;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        
+        .time-display {
+            font-size: 0.9em;
+            color: #a0aec0;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: #4a5568;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #3182ce;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #4a5568;
+            border-top: 3px solid #3182ce;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        .success-message {
+            color: #68d391;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            color: #fc8181;
+            font-weight: 600;
+        }
+        
+        .loading-message {
+            color: #63b3ed;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row, .recording-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .audio-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .audio-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 TTS Generator</h1>
+            <p>Convert your text to high-quality speech with Murf AI</p>
+        </div>
+        
+        <div class="content">
+            <!-- TTS Generator Section -->
+            <div class="section">
+                <div class="input-section">
+                    <form id="ttsForm">
+                        <div class="form-group">
+                            <label for="text">Enter Your Text:</label>
+                            <textarea 
+                                id="text" 
+                                placeholder="Type or paste the text you want to convert to speech..."
+                                required
+                            >Hello! Welcome to the 30 Days of MurfAI challenge. This is an amazing text-to-speech generator powered by Murf AI.</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="voice_id">Select Voice:</label>
+                                <select id="voice_id">
+                                    <option value="en-US-ken">Ken (US English, Male)</option>
+                                    <option value="en-US-sarah">Sarah (US English, Female)</option>
+                                    <option value="en-US-marcus">Marcus (US English, Male)</option>
+                                    <option value="en-US-claire">Claire (US English, Female)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="style">Speaking Style:</label>
+                                <select id="style">
+                                    <option value="Neutral">Neutral</option>
+                                    <option value="Cheerful">Cheerful</option>
+                                    <option value="Excited">Excited</option>
+                                    <option value="Calm">Calm</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="generate-btn" id="generateBtn">
+                            🎯 Generate Audio
+                        </button>
+                    </form>
+                </div>
+                
+                <div id="resultSection" class="result-section hidden">
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+            
+            <!-- Echo Bot Section -->
+            <div class="section">
+                <h1>Echo Bot</h1>
+                <div class="input-section">
+                    <div class="recording-status" id="recordingStatus">
+                        <div class="recording-timer" id="recordingTimer">Ready to record</div>
+                    </div>
+                    
+                    <div class="recording-controls">
+                        <button class="record-btn" id="startRecordBtn">
+                            Start Recording
+                        </button>
+                        <button class="record-btn" id="stopRecordBtn" disabled>
+                            Stop Recording
+                        </button>
+                    </div>
+                    
+                    <div id="echoResult" class="result-section hidden">
+                        <div id="echoContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Combined TTS and Echo Bot Application
+        class VoiceApp {
+            constructor() {
+                this.currentAudio = null;
+                this.isPlaying = false;
+                this.isLoading = false;
+                
+                // Echo Bot properties
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.isRecording = false;
+                this.recordingStartTime = null;
+                this.recordingInterval = null;
+                this.isResetting = false; // Add flag to prevent processing during reset
+                
+                this.init();
+            }
+
+            init() {
+                // TTS Form submission handler
+                document.getElementById('ttsForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.generateTTS();
+                });
+                
+                // Echo Bot event listeners
+                document.getElementById('startRecordBtn').addEventListener('click', () => {
+                    const btn = document.getElementById('startRecordBtn');
+                    if (btn.innerHTML === '🔄 RESET') {
+                        this.resetRecording();
+                    } else {
+                        this.startRecording();
+                    }
+                });
+                
+                document.getElementById('stopRecordBtn').addEventListener('click', () => {
+                    this.stopRecording();
+                });
+                
+                // Initialize microphone access
+                this.initializeMicrophone();
+            }
+
+            
+            // TTS Methods
+            async generateTTS() {
+                if (this.isLoading) return;
+
+                const text = document.getElementById('text').value.trim();
+                const voiceId = document.getElementById('voice_id').value;
+                const style = document.getElementById('style').value;
+
+                if (!text) {
+                    this.showTTSError('Please enter some text to convert to speech.');
+                    return;
+                }
+
+                this.setLoading(true);
+                this.showTTSResult('loading', 'Generating audio with Murf AI...', '');
+
+                try {
+                    const response = await fetch('/tts/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            voice_id: voiceId,
+                            style: style
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.detail || 'Failed to generate audio');
+                    }
+
+                    if (data.success && data.audio_url) {
+                        this.showAudioPlayer(data, text);
+                    } else {
+                        throw new Error(data.message || 'No audio URL received');
+                    }
+
+                } catch (error) {
+                    this.showTTSError(`Failed to generate audio: ${error.message}`);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            showAudioPlayer(data, originalText) {
+                const wordCount = data.word_count || originalText.split(' ').length;
+                const estimatedDuration = Math.ceil(wordCount * 0.5);
+
+                const audioPlayerHTML = `
+                    <div class="message success-message">
+                        ✅ Audio generated successfully!
+                    </div>
+                    <div class="audio-player-container">
+                        <div class="audio-info">
+                            <h3>🎵 Generated Audio</h3>
+                            <div class="audio-stats">
+                                <span>📝 Words: ${wordCount}</span>
+                                <span>⏱️ Est. Duration: ${estimatedDuration}s</span>
+                            </div>
+                        </div>
+                        
+                        <div class="custom-audio-player">
+                            <button class="play-pause-btn" id="playPauseBtn">
+                                ▶️
+                            </button>
+                            
+                            <div class="progress-container" id="progressContainer">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            
+                            <div class="time-display" id="timeDisplay">
+                                0:00 / 0:00
+                            </div>
+                            
+                            <div class="volume-container">
+                                <span>🔊</span>
+                                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                        
+                        <audio id="audioElement" preload="auto" style="display: none;">
+                            <source src="${data.audio_url}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                `;
+
+                this.showTTSResult('success', '', audioPlayerHTML);
+                this.initializeAudioPlayer();
+            }
+
+            initializeAudioPlayer() {
+                this.currentAudio = document.getElementById('audioElement');
+                const playPauseBtn = document.getElementById('playPauseBtn');
+                const progressContainer = document.getElementById('progressContainer');
+                const progressBar = document.getElementById('progressBar');
+                const timeDisplay = document.getElementById('timeDisplay');
+                const volumeSlider = document.getElementById('volumeSlider');
+
+                playPauseBtn.addEventListener('click', () => {
+                    if (this.isPlaying) {
+                        this.pauseAudio();
+                    } else {
+                        this.playAudio();
+                    }
+                });
+
+                progressContainer.addEventListener('click', (e) => {
+                    const clickX = e.offsetX;
+                    const width = progressContainer.offsetWidth;
+                    const duration = this.currentAudio.duration;
+                    const newTime = (clickX / width) * duration;
+                    this.currentAudio.currentTime = newTime;
+                });
+
+                volumeSlider.addEventListener('input', (e) => {
+                    this.currentAudio.volume = e.target.value / 100;
+                });
+
+                this.currentAudio.addEventListener('loadedmetadata', () => {
+                    this.updateTimeDisplay();
+                });
+
+                this.currentAudio.addEventListener('timeupdate', () => {
+                    this.updateProgress();
+                    this.updateTimeDisplay();
+                });
+
+                this.currentAudio.addEventListener('ended', () => {
+                    this.isPlaying = false;
+                    playPauseBtn.innerHTML = '▶️';
+                    progressBar.style.width = '0%';
+                });
+
+                this.currentAudio.addEventListener('error', (e) => {
+                    this.showTTSError('Failed to load audio file. Please try generating again.');
+                });
+
+                this.currentAudio.load();
+            }
+
+            playAudio() {
+                if (this.currentAudio) {
+                    this.currentAudio.play().then(() => {
+                        this.isPlaying = true;
+                        document.getElementById('playPauseBtn').innerHTML = '⏸️';
+                    }).catch((error) => {
+                        this.showTTSError('Failed to play audio. Please try again.');
+                    });
+                }
+            }
+
+            pauseAudio() {
+                if (this.currentAudio) {
+                    this.currentAudio.pause();
+                    this.isPlaying = false;
+                    document.getElementById('playPauseBtn').innerHTML = '▶️';
+                }
+            }
+
+            updateProgress() {
+                if (this.currentAudio && this.currentAudio.duration) {
+                    const progress = (this.currentAudio.currentTime / this.currentAudio.duration) * 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                }
+            }
+
+            updateTimeDisplay() {
+                if (this.currentAudio) {
+                    const current = this.formatTime(this.currentAudio.currentTime || 0);
+                    const duration = this.formatTime(this.currentAudio.duration || 0);
+                    document.getElementById('timeDisplay').textContent = `${current} / ${duration}`;
+                }
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            showTTSResult(type, message, content) {
+                const resultSection = document.getElementById('resultSection');
+                const resultContent = document.getElementById('resultContent');
+                
+                resultSection.className = `result-section ${type}`;
+                resultSection.classList.remove('hidden');
+                
+                let html = '';
+                if (message) {
+                    const messageClass = type === 'error' ? 'error-message' : 
+                                        type === 'loading' ? 'loading-message' : 'success-message';
+                    html += `<div class="message ${messageClass}">`;
+                    if (type === 'loading') {
+                        html += `<span class="loading-spinner"></span> `;
+                    }
+                    html += `${message}</div>`;
+                }
+                
+                if (content) {
+                    html += content;
+                }
+                
+                resultContent.innerHTML = html;
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            showTTSError(message) {
+                this.showTTSResult('error', `❌ ${message}`, '');
+            }
+
+            setLoading(loading) {
+                this.isLoading = loading;
+                const btn = document.getElementById('generateBtn');
+                
+                if (loading) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '🎯 Generate Audio';
+                }
+            }
+            
+            // Echo Bot Methods
+            async initializeMicrophone() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log('Microphone access granted');
+                    // Stop the stream for now, we'll use it when recording starts
+                    stream.getTracks().forEach(track => track.stop());
+                } catch (error) {
+                    this.showEchoError('Microphone access denied. Please allow microphone access to use the Echo Bot.');
+                }
+            }
+            
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+                    
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+                    
+                    this.mediaRecorder.onstop = () => {
+                        // Only process the recording if we're not resetting
+                        if (!this.isResetting) {
+                            const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                            // Upload audio and show file details instead of playing
+                            this.uploadAndShowFileDetails(audioBlob);
+                        }
+                        // Stop all tracks to release the microphone
+                        stream.getTracks().forEach(track => track.stop());
+                        // Reset the flag
+                        this.isResetting = false;
+                    };
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.recordingStartTime = Date.now();
+                    
+                    // Clear any existing interval
+                    if (this.recordingInterval) {
+                        clearInterval(this.recordingInterval);
+                    }
+                    
+                    // Update UI - Change Start Recording to Reset
+                    const startBtn = document.getElementById('startRecordBtn');
+                    startBtn.innerHTML = '🔄 RESET';
+                    startBtn.disabled = false;
+                    startBtn.classList.add('recording');
+                    
+                    document.getElementById('stopRecordBtn').disabled = false;
+                    document.getElementById('recordingStatus').classList.add('recording');
+                    
+                    // Start timer
+                    this.recordingInterval = setInterval(() => {
+                        this.updateRecordingTimer();
+                    }, 100);
+                    
+                    this.hideEchoResult();
+                    
+                } catch (error) {
+                    this.showEchoError('Failed to start recording. Please check your microphone permissions.');
+                }
+            }
+            
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    
+                    // Update UI - Restore original button text
+                    const startBtn = document.getElementById('startRecordBtn');
+                    startBtn.innerHTML = '🎤 START RECORDING';
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('recording');
+                    
+                    document.getElementById('stopRecordBtn').disabled = true;
+                    document.getElementById('recordingStatus').classList.remove('recording');
+                    
+                    // Stop timer and clear interval
+                    clearInterval(this.recordingInterval);
+                    this.recordingInterval = null;
+                    this.recordingStartTime = null;
+                    document.getElementById('recordingTimer').textContent = 'Processing recording...';
+                }
+            }
+            
+            resetRecording() {
+                // Set the flag to prevent processing the stopped recording
+                this.isResetting = true;
+                
+                // Stop current recording if active
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                    
+                    // Stop timer
+                    clearInterval(this.recordingInterval);
+                    this.recordingInterval = null;
+                    this.recordingStartTime = null;
+                }
+                
+                // Reset UI to initial state
+                const startBtn = document.getElementById('startRecordBtn');
+                startBtn.innerHTML = '🎤 START RECORDING';
+                startBtn.disabled = false;
+                startBtn.classList.remove('recording');
+                
+                document.getElementById('stopRecordBtn').disabled = true;
+                document.getElementById('recordingStatus').classList.remove('recording');
+                document.getElementById('recordingTimer').textContent = 'Ready to record';
+                
+                // Hide any existing results
+                this.hideEchoResult();
+                
+                // Add a small delay to ensure clean state transition
+                setTimeout(() => {
+                    // Start new recording immediately after cleanup
+                    this.startRecording();
+                }, 50);
+            }
+            
+            updateRecordingTimer() {
+                if (this.recordingStartTime) {
+                    const elapsed = (Date.now() - this.recordingStartTime) / 1000;
+                    document.getElementById('recordingTimer').textContent = `Recording: ${elapsed.toFixed(1)}s`;
+                }
+            }
+            
+            playRecordedAudio(audioBlob) {
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                const echoPlayerHTML = `
+                    <div class="message success-message">
+                        ✅ Recording captured successfully!
+                    </div>
+                    <div class="audio-player-container">
+                        <div class="audio-info">
+                            <h3>🎵 Your Recording</h3>
+                            <div class="audio-stats">
+                                <span>📝 Type: Voice Recording</span>
+                            </div>
+                        </div>
+                        
+                        <audio class="echo-audio-player" controls>
+                            <source src="${audioUrl}" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        
+                        <div class="recording-actions" style="margin-top: 15px; text-align: center;">
+                            <button id="recordAgainBtn" class="record-btn" style="background: #4ade80; padding: 12px 24px; border-radius: 8px; border: none; color: white; font-weight: 600; cursor: pointer; font-size: 14px;">
+                                🎤 Record Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                this.showEchoResult('success', '', echoPlayerHTML);
+                
+                // Reset timer display
+                document.getElementById('recordingTimer').textContent = 'Ready to record';
+                
+                // Add event listener for Record Again button
+                document.getElementById('recordAgainBtn').addEventListener('click', () => {
+                    this.hideEchoResult();
+                    // Reset the UI to initial state
+                    const startBtn = document.getElementById('startRecordBtn');
+                    startBtn.innerHTML = '🎤 START RECORDING';
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('recording');
+                    
+                    document.getElementById('stopRecordBtn').disabled = true;
+                    document.getElementById('recordingStatus').classList.remove('recording');
+                    document.getElementById('recordingTimer').textContent = 'Ready to record';
+                });
+            }
+            
+            showEchoResult(type, message, content) {
+                const resultSection = document.getElementById('echoResult');
+                const resultContent = document.getElementById('echoContent');
+                
+                resultSection.className = `result-section ${type}`;
+                resultSection.classList.remove('hidden');
+                
+                let html = '';
+                if (message) {
+                    const messageClass = type === 'error' ? 'error-message' : 
+                                        type === 'loading' ? 'loading-message' : 'success-message';
+                    html += `<div class="message ${messageClass}">${message}</div>`;
+                }
+                
+                if (content) {
+                    html += content;
+                }
+                
+                resultContent.innerHTML = html;
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            showEchoError(message) {
+                this.showEchoResult('error', `❌ ${message}`, '');
+            }
+            
+            // Upload audio and show file details
+            async uploadAndShowFileDetails(audioBlob) {
+                try {
+                    // Show processing message
+                    document.getElementById('recordingTimer').textContent = 'Processing with Murf AI...';
+                    this.showEchoResult('loading', 'Processing your recording...', `
+                        <div style="text-align: center; padding: 20px;">
+                            <div class="loading-spinner" style="margin: 0 auto;"></div>
+                            <p style="margin-top: 15px; color: #a0aec0;">Transcribing audio and generating Murf voice...</p>
+                        </div>
+                    `);
+                    
+                    // Create FormData to send the file
+                    const formData = new FormData();
+                    const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
+                    formData.append('audio_file', audioFile);
+                    
+                    // Send to the new echo endpoint that uses Murf
+                    const response = await fetch('/tts/echo', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    let errorMessage = '';
+                    if (!response.ok) {
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.detail || `Echo processing failed`;
+                        } catch (e) {
+                            errorMessage = `Echo processing failed (Status: ${response.status})`;
+                        }
+                        
+                        // Check for specific error types
+                        if (errorMessage.includes('No speech detected')) {
+                            errorMessage = 'No speech detected in your recording. Please speak clearly and try again.';
+                        } else if (errorMessage.includes('ASSEMBLYAI_API_KEY')) {
+                            errorMessage = 'Transcription service not configured. Please check server configuration.';
+                        } else if (errorMessage.includes('MURF_API_KEY')) {
+                            errorMessage = 'Murf AI service not configured. Please check server configuration.';
+                        }
+                        
+                        throw new Error(errorMessage);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Extract transcript from message
+                        const transcriptMatch = result.message.match(/Transcript: (.+)/);
+                        const transcript = transcriptMatch ? transcriptMatch[1] : 'Audio processed';
+                        
+                        // Show Murf echo results
+                        this.showMurfEchoResult(result, transcript, audioBlob);
+                    } else {
+                        throw new Error(result.message || 'Echo processing failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Echo Bot error:', error);
+                    // Reset timer display
+                    document.getElementById('recordingTimer').textContent = 'Ready to record';
+                    this.showEchoError(error.message || 'Echo processing failed. Please try again.');
+                }
+            }
+            
+            showMurfEchoResult(echoResult, transcript, originalAudioBlob) {
+                // Use the Murf-generated audio URL
+                const murfAudioUrl = echoResult.audio_url;
+                const originalAudioUrl = URL.createObjectURL(originalAudioBlob);
+                
+                // Calculate file sizes
+                const originalFileSize = this.formatFileSize(originalAudioBlob.size);
+                
+                const echoHTML = `
+                    <div class="message success-message">
+                        ✅ Echo generated with Murf voice!
+                    </div>
+                    <div class="transcription-container" style="background: rgba(45, 55, 72, 0.8); padding: 25px;">
+                        <div class="transcription-details">
+                            <h3 style="color: #68d391; font-size: 22px; margin-bottom: 20px;">🎤 Echo Bot Results</h3>
+                            
+                            <!-- Transcript Section -->
+                            <div class="transcript-text" style="margin-bottom: 25px;">
+                                <div class="transcript-label" style="margin-bottom: 10px;">
+                                    <strong style="font-size: 16px;">📝 What you said:</strong>
+                                </div>
+                                <div class="transcript-content" style="background: rgba(26, 32, 44, 0.9); padding: 18px; font-size: 17px; line-height: 1.7;">
+                                    "${transcript}"
+                                </div>
+                            </div>
+                            
+                            <!-- File & Processing Details -->
+                            <div class="file-details" style="background: rgba(68, 211, 145, 0.05); padding: 18px; margin-bottom: 25px;">
+                                <h4 style="color: #68d391; margin-bottom: 15px; font-size: 16px;">📊 Processing Details</h4>
+                                <div class="detail-item" style="padding: 10px 0;">
+                                    <strong>📁 Original File:</strong> recording.wav
+                                </div>
+                                <div class="detail-item" style="padding: 10px 0;">
+                                    <strong>💾 Original Size:</strong> ${originalFileSize}
+                                </div>
+                                <div class="detail-item" style="padding: 10px 0;">
+                                    <strong>🎧 Audio Format:</strong> WAV (Original) / MP3 (Murf)
+                                </div>
+                                <div class="detail-item" style="padding: 10px 0;">
+                                    <strong>📊 Word Count:</strong> ${echoResult.word_count || transcript.split(' ').length} words
+                                </div>
+                                <div class="detail-item" style="padding: 10px 0;">
+                                    <strong>🎯 Murf Voice:</strong> Natalie (US English, Female)
+                                </div>
+                                <div class="detail-item" style="padding: 10px 0; border-bottom: none;">
+                                    <strong>🗣️ Speaking Style:</strong> Neutral
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Audio Players Section -->
+                        <div style="display: grid; gap: 20px;">
+                            <!-- Original Recording -->
+                            <div class="audio-playback-section" style="background: rgba(68, 211, 145, 0.08); border: 2px solid rgba(68, 211, 145, 0.3); padding: 20px; border-radius: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h4 style="color: #68d391; margin: 0; font-size: 18px;">🎙️ Your Original Recording</h4>
+                                    <span style="color: #a0aec0; font-size: 13px; background: rgba(26, 32, 44, 0.6); padding: 4px 10px; border-radius: 6px;">WAV • ${originalFileSize}</span>
+                                </div>
+                                <audio class="echo-audio-player" controls style="width: 100%; height: 54px; background: rgba(26, 32, 44, 0.8); border-radius: 27px;">
+                                    <source src="${originalAudioUrl}" type="audio/wav">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                            
+                            <!-- Murf Echo -->
+                            <div class="audio-playback-section" style="background: rgba(49, 130, 206, 0.08); border: 2px solid rgba(49, 130, 206, 0.3); padding: 20px; border-radius: 12px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h4 style="color: #3182ce; margin: 0; font-size: 18px;">🤖 Murf AI Echo</h4>
+                                    <span style="color: #a0aec0; font-size: 13px; background: rgba(26, 32, 44, 0.6); padding: 4px 10px; border-radius: 6px;">MP3 • Natalie Voice</span>
+                                </div>
+                                <audio class="echo-audio-player" controls style="width: 100%; height: 54px; background: rgba(26, 32, 44, 0.8); border-radius: 27px;">
+                                    <source src="${murfAudioUrl}" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="recording-actions" style="margin-top: 30px; text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <button id="downloadOriginalBtn" class="action-btn download-btn" style="background: linear-gradient(135deg, #6b7280, #4b5563); padding: 14px 24px; border-radius: 10px; border: none; color: white; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3); transition: all 0.3s ease;">
+                                📥 Download Original
+                            </button>
+                            <button id="downloadMurfBtn" class="action-btn download-btn" style="background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 14px 24px; border-radius: 10px; border: none; color: white; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+                                📥 Download Murf Echo
+                            </button>
+                            <button id="recordAgainBtn" class="action-btn record-btn" style="background: linear-gradient(135deg, #4ade80, #22c55e); padding: 14px 24px; border-radius: 10px; border: none; color: white; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); transition: all 0.3s ease;">
+                                🎤 Record Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                this.showEchoResult('success', '', echoHTML);
+                
+                // Reset timer display
+                document.getElementById('recordingTimer').textContent = 'Ready to record';
+                
+                // Add event listener for Download Original button
+                document.getElementById('downloadOriginalBtn').addEventListener('click', () => {
+                    this.downloadAudio(originalAudioUrl, 'original_recording.wav');
+                });
+                
+                // Add event listener for Download Murf button
+                document.getElementById('downloadMurfBtn').addEventListener('click', () => {
+                    // For Murf audio, we need to fetch it first
+                    fetch(murfAudioUrl)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const url = URL.createObjectURL(blob);
+                            this.downloadAudio(url, 'murf_echo.mp3');
+                        })
+                        .catch(error => {
+                            console.error('Failed to download Murf audio:', error);
+                            alert('Failed to download Murf audio. You can try right-clicking on the audio player and selecting "Save audio as..."');
+                        });
+                });
+                
+                // Add event listener for Record Again button
+                document.getElementById('recordAgainBtn').addEventListener('click', () => {
+                    this.hideEchoResult();
+                    // Reset the UI to initial state
+                    const startBtn = document.getElementById('startRecordBtn');
+                    startBtn.innerHTML = '🎤 START RECORDING';
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('recording');
+                    
+                    document.getElementById('stopRecordBtn').disabled = true;
+                    document.getElementById('recordingStatus').classList.remove('recording');
+                    document.getElementById('recordingTimer').textContent = 'Ready to record';
+                });
+            }
+            
+            showTranscriptionResult(transcriptionResult, audioBlob, audioFile) {
+                // This method is kept for backwards compatibility but won't be used in the new Echo Bot
+                this.showMurfEchoResult(
+                    { audio_url: URL.createObjectURL(audioBlob), word_count: transcriptionResult.transcript?.split(' ').length },
+                    transcriptionResult.transcript || 'No speech detected',
+                    audioBlob
+                );
+            }
+            
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            downloadAudio(audioUrl, filename) {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = audioUrl;
+                downloadLink.download = filename;
+                downloadLink.style.display = 'none';
+                
+                // Add to DOM, click, and remove
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Show download success message
+                const messageContainer = document.querySelector('.echo-response');
+                if (messageContainer) {
+                    const downloadMessage = document.createElement('div');
+                    downloadMessage.className = 'message info-message';
+                    downloadMessage.innerHTML = '📥 Download started! Check your Downloads folder.';
+                    downloadMessage.style.cssText = 'margin-top: 10px; padding: 12px; background: #dbeafe; color: #1d4ed8; border-radius: 8px; font-weight: 500;';
+                    
+                    messageContainer.appendChild(downloadMessage);
+                    
+                    // Remove the message after 3 seconds
+                    setTimeout(() => {
+                        if (downloadMessage.parentNode) {
+                            downloadMessage.remove();
+                        }
+                    }, 3000);
+                }
+            }
+            
+            hideEchoResult() {
+                document.getElementById('echoResult').classList.add('hidden');
+            }
+        }
+
+        // Initialize the Voice app when DOM is loaded - NO ALERTS!
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceApp();
+        });
+    </script>
+</body>
+</html>
