@@ -1,0 +1,22 @@
+# 30 Days of MurfAI - AI Conversational Assistant
+# Required dependencies for running the application
+
+# Core FastAPI web framework and server
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+
+# Environment configuration
+python-dotenv==1.0.0
+
+# File upload support (required for audio file handling)
+python-multipart==0.0.20
+
+# AI Service SDKs (used by main.py)
+murf                          # Text-to-speech generation
+assemblyai==0.42.1            # Speech-to-text transcription  
+google-generativeai           # Google Gemini LLM for conversations
+
+# Note: The following are built-in Python modules (no installation needed):
+# - os, shutil, datetime, collections, typing
+# - pydantic is included with FastAPI
+# - CORS middleware is included with FastAPI
